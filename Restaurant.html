@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RestauManager Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .icon-table { background: linear-gradient(135deg, #ff6b6b, #ee5a52); }
+        .icon-menu { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+        .icon-order { background: linear-gradient(135deg, #45b7d1, #3498db); }
+        .icon-reservation { background: linear-gradient(135deg, #f093fb, #f5576c); }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: scale(1.02);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.3s ease;
+        }
+
+        .data-table tr:hover td {
+            background-color: #f8f9ff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalPop 0.3s ease-out;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quantity-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .floating-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nav-tabs {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">🍽️ RestauManager Pro</div>
+                <nav class="nav-tabs">
+                    <button class="tab-btn active" onclick="showSection('dashboard')">Dashboard</button>
+                    <button class="tab-btn" onclick="showSection('tables')">Tables</button>
+                    <button class="tab-btn" onclick="showSection('menu')">Menu</button>
+                    <button class="tab-btn" onclick="showSection('commandes')">Commandes</button>
+                    <button class="tab-btn" onclick="showSection('reservations')">Réservations</button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Dashboard -->
+        <section id="dashboard" class="content-section active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number" id="totalTables">12</span>
+                    <div class="stat-label">Tables Totales</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="activeOrders">8</span>
+                    <div class="stat-label">Commandes Actives</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="todayRevenue">2,485</span>
+                    <div class="stat-label">Revenus du Jour (Ar)</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="reservationsToday">5</span>
+                    <div class="stat-label">Réservations Aujourd'hui</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 class="card-title">
+                        <span class="icon icon-table">🪑</span>
+                        État des Tables
+                    </h3>
+                    <div id="tableStatus"></div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">
+                        <span class="icon icon-order">📋</span>
+                        Commandes Récentes
+                    </h3>
+                    <div id="recentOrders"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tables Management -->
+        <section id="tables" class="content-section">
+            <div class="card">
+                <h3 class="card-title">
+                    <span class="icon icon-table">🪑</span>
+                    Gestion des Tables
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Numéro de Table</label>
+                    <input type="number" id="tableNumber" class="form-input" placeholder="Ex: 06">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Désignation</label>
+                    <input type="text" id="tableDesignation" class="form-input" placeholder="Table principale, terrasse...">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Occupation</label>
+                    <select id="tableOccupation" class="form-select">
+                        <option value="false">Libre</option>
+                        <option value="true">Occupée</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="addTable()">Ajouter Table</button>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Désignation</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablesTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Menu Management -->
+        <section id="menu" class="content-section">
+            <div class="card">
+                <h3 class="card-title">
+                    <span class="icon icon-menu">🍽️</span>
+                    Gestion du Menu
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Nom du Plat</label>
+                    <input type="text" id="menuName" class="form-input" placeholder="Ex: Jus naturel">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Prix Unitaire (Ar)</label>
+                    <input type="number" id="menuPrice" class="form-input" placeholder="Ex: 1500">
+                </div>
+
+                <button class="btn" onclick="addMenuItem()">Ajouter au Menu</button>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Plat</th>
+                            <th>Prix (Ar)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="menuTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Orders Management -->
+        <section id="commandes" class="content-section">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 class="card-title">
+                        <span class="icon icon-order">📋</span>
+                        Nouvelle Commande
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Nom du Client</label>
+                        <input type="text" id="clientName" class="form-input" placeholder="Ex: MARIA">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Table</label>
+                        <select id="orderTable" class="form-select"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Type de Commande</label>
+                        <select id="orderType" class="form-select">
+                            <option value="sur-table">Sur table</option>
+                            <option value="a-emporter">À emporter</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Ajouter Plat</label>
+                        <select id="dishSelect" class="form-select"></select>
+                        <button class="btn" onclick="addDishToOrder()" style="margin-top: 10px;">Ajouter</button>
+                    </div>
+
+                    <div id="orderItems"></div>
+                    
+                    <div style="margin-top: 20px;">
+                        <strong>Total: <span id="orderTotal">0</span> Ar</strong>
+                    </div>
+
+                    <button class="btn btn-success" onclick="createOrder()" style="width: 100%; margin-top: 15px;">Créer Commande</button>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">
+                        <span class="icon icon-order">📋</span>
+                        Commandes Actives
+                    </h3>
+                    <div id="activeOrdersList"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reservations Management -->
+        <section id="reservations" class="content-section">
+            <div class="card">
+                <h3 class="card-title">
+                    <span class="icon icon-reservation">📅</span>
+                    Gestion des Réservations
+                </h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Nom du Client</label>
+                    <input type="text" id="reservationClient" class="form-input" placeholder="Nom du client">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Table</label>
+                    <select id="reservationTable" class="form-select"></select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Date de Réservation</label>
+                    <input type="datetime-local" id="reservationDateTime" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Nombre de Personnes</label>
+                    <input type="number" id="reservationGuests" class="form-input" placeholder="Ex: 4">
+                </div>
+
+                <button class="btn" onclick="addReservation()">Ajouter Réservation</button>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Table</th>
+                            <th>Date/Heure</th>
+                            <th>Personnes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reservationsTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <button class="floating-btn" onclick="showReports()" title="Rapports">📊</button>
+
+    <!-- Modal for Reports -->
+    <div id="reportsModal" class="modal">
+        <div class="modal-content">
+            <h2>Rapports et Statistiques</h2>
+            <div id="reportsContent"></div>
+            <button class="btn btn-danger" onclick="closeModal()">Fermer</button>
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let tables = [
+            { id: 1, number: '06', designation: 'Table principale', occupied: false }
+        ];
+        
+        let menuItems = [
+            { id: 1, name: 'Jus naturel', price: 1500 },
+            { id: 2, name: 'Mine sau poulet', price: 10000 }
+        ];
+        
+        let orders = [];
+        let reservations = [];
+        let currentOrder = { items: [], total: 0 };
+
+        // Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (sectionId === 'dashboard') {
+                updateDashboard();
+            } else if (sectionId === 'commandes') {
+                updateOrderSelects();
+            } else if (sectionId === 'reservations') {
+                updateReservationSelect();
+            }
+        }
+
+        // Tables Management
+        function addTable() {
+            const number = document.getElementById('tableNumber').value;
+            const designation = document.getElementById('tableDesignation').value;
+            const occupied = document.getElementById('tableOccupation').value === 'true';
+
+            if (!number || !designation) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+
+            const newTable = {
+                id: Date.now(),
+                number: number,
+                designation: designation,
+                occupied: occupied
+            };
+
+            tables.push(newTable);
+            updateTablesTable();
+            clearTableForm();
+        }
+
+        function deleteTable(id) {
+            tables = tables.filter(table => table.id !== id);
+            updateTablesTable();
+        }
+
+        function toggleTableStatus(id) {
+            const table = tables.find(t => t.id === id);
+            if (table) {
+                table.occupied = !table.occupied;
+                updateTablesTable();
+                updateDashboard();
+            }
+        }
+
+        function updateTablesTable() {
+            const tbody = document.getElementById('tablesTableBody');
+            tbody.innerHTML = '';
+
+            tables.forEach(table => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${table.number}</td>
+                    <td>${table.designation}</td>
+                    <td>
+                        <span style="padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; 
+                              background: ${table.occupied ? '#ff6b6b' : '#4ecdc4'}; color: white;">
+                            ${table.occupied ? 'Occupée' : 'Libre'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn" onclick="toggleTableStatus(${table.id})" style="margin-right: 5px; padding: 8px 12px; font-size: 0.8rem;">
+                            ${table.occupied ? 'Libérer' : 'Occuper'}
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteTable(${table.id})" style="padding: 8px 12px; font-size: 0.8rem;">
+                            Supprimer
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function clearTableForm() {
+            document.getElementById('tableNumber').value = '';
+            document.getElementById('tableDesignation').value = '';
+            document.getElementById('tableOccupation').value = 'false';
+        }
+
+        // Menu Management
+        function addMenuItem() {
+            const name = document.getElementById('menuName').value;
+            const price = parseInt(document.getElementById('menuPrice').value);
+
+            if (!name || !price) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+
+            const newItem = {
+                id: Date.now(),
+                name: name,
+                price: price
+            };
+
+            menuItems.push(newItem);
+            updateMenuTable();
+            clearMenuForm();
+        }
+
+        function deleteMenuItem(id) {
+            menuItems = menuItems.filter(item => item.id !== id);
+            updateMenuTable();
+        }
+
+        function updateMenuTable() {
+            const tbody = document.getElementById('menuTableBody');
+            tbody.innerHTML = '';
+
+            menuItems.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>${item.price.toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteMenuItem(${item.id})" style="padding: 8px 12px; font-size: 0.8rem;">
+                            Supprimer
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function clearMenuForm() {
+            document.getElementById('menuName').value = '';
+            document.getElementById('menuPrice').value = '';
+        }
+
+        // Orders Management
+        function updateOrderSelects() {
+            const tableSelect = document.getElementById('orderTable');
+            const dishSelect = document.getElementById('dishSelect');
+
+            // Update table select
+            tableSelect.innerHTML = '<option value="">Choisir une table</option>';
+            tables.filter(table => !table.occupied).forEach(table => {
+                const option = document.createElement('option');
+                option.value = table.id;
+                option.textContent = `Table ${table.number} - ${table.designation}`;
+                tableSelect.appendChild(option);
+            });
+
+            // Update dish select
+            dishSelect.innerHTML = '<option value="">Choisir un plat</option>';
+            menuItems.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = `${item.name} - ${item.price} Ar`;
+                dishSelect.appendChild(option);
+            });
+        }
+
+        function addDishToOrder() {
+            const dishId = parseInt(document.getElementById('dishSelect').value);
+            if (!dishId) return;
+
+            const dish = menuItems.find(item => item.id === dishId);
+            if (!dish) return;
+
+            const existingItem = currentOrder.items.find(item => item.id === dishId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                currentOrder.items.push({
+                    id: dish.id,
+                    name: dish.name,
+                    price: dish.price,
+                    quantity: 1
+                });
+            }
+
+            updateOrderDisplay();
+        }
+
+        function updateOrderDisplay() {
+            const container = document.getElementById('orderItems');
+            container.innerHTML = '';
+
+            currentOrder.total = 0;
+
+            currentOrder.items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'order-item';
+                itemDiv.innerHTML = `
+                    <span>${item.name}</span>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="changeQuantity(${item.id}, -1)">-</button>
+                        <span>${item.quantity}</span>
+                        <button class="quantity-btn" onclick="changeQuantity(${item.id}, 1)">+</button>
+                        <span style="margin-left: 10px; font-weight: bold;">${(item.price * item.quantity).toLocaleString()} Ar</span>
+                    </div>
+                `;
+                container.appendChild(itemDiv);
+
+                currentOrder.total += item.price * item.quantity;
+            });
+
+            document.getElementById('orderTotal').textContent = currentOrder.total.toLocaleString();
+        }
+
+        function changeQuantity(itemId, change) {
+            const item = currentOrder.items.find(item => item.id === itemId);
+            if (!item) return;
+
+            item.quantity += change;
+            if (item.quantity <= 0) {
+                currentOrder.items = currentOrder.items.filter(item => item.id !== itemId);
+            }
+
+            updateOrderDisplay();
+        }
+
+        function createOrder() {
+            const clientName = document.getElementById('clientName').value;
+            const tableId = parseInt(document.getElementById('orderTable').value);
+            const orderType = document.getElementById('orderType').value;
+
+            if (!clientName || currentOrder.items.length === 0) {
+                alert('Veuillez remplir tous les champs et ajouter des plats');
+                return;
+            }
+
+            const newOrder = {
+                id: Date.now(),
+                code: 'A' + String(orders.length + 1).padStart(3, '0'),
+                client: clientName,
+                tableId: tableId,
+                table: tableId ? tables.find(t => t.id === tableId)?.number : null,
+                type: orderType,
+                items: [...currentOrder.items],
+                total: currentOrder.total,
+                date: new Date(),
+                status: 'active'
+            };
+
+            orders.push(newOrder);
+
+            // Mark table as occupied if it's a table order
+            if (tableId) {
+                const table = tables.find(t => t.id === tableId);
+                if (table) {
+                    table.occupied = true;
+                }
+            }
+
+            // Clear current order
+            currentOrder = { items: [], total: 0 };
+            clearOrderForm();
+            updateOrderDisplay();
+            updateActiveOrdersList();
+            updateDashboard();
+
+            alert(`Commande ${newOrder.code} créée avec succès!`);
+        }
+
+        function clearOrderForm() {
+            document.getElementById('clientName').value = '';
+            document.getElementById('orderTable').value = '';
+            document.getElementById('orderType').value = 'sur-table';
+            document.getElementById('dishSelect').value = '';
+        }
+
+        function updateActiveOrdersList() {
+            const container = document.getElementById('activeOrdersList');
+            const activeOrders = orders.filter(order => order.status === 'active');
+
+            if (activeOrders.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Aucune commande active</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            activeOrders.forEach(order => {
+                const orderDiv = document.createElement('div');
+                orderDiv.className = 'order-item';
+                orderDiv.style.flexDirection = 'column';
+                orderDiv.style.alignItems = 'flex-start';
+                orderDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 10px;">
+                        <strong>${order.code} - ${order.client}</strong>
+                        <span style="color: #667eea; font-weight: bold;">${order.total.toLocaleString()} Ar</span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #7f8c8d; margin-bottom: 10px;">
+                        ${order.table ? `Table ${order.table}` : 'À emporter'} • ${order.items.length} plat(s)
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-success" onclick="completeOrder(${order.id})" style="padding: 6px 12px; font-size: 0.8rem;">
+                            Terminer
+                        </button>
+                        <button class="btn" onclick="viewOrderDetails(${order.id})" style="padding: 6px 12px; font-size: 0.8rem;">
+                            Détails
+                        </button>
+                    </div>
+                `;
+                container.appendChild(orderDiv);
+            });
+        }
+
+        function completeOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            order.status = 'completed';
+            order.completedAt = new Date();
+
+            // Free the table if applicable
+            if (order.tableId) {
+                const table = tables.find(t => t.id === order.tableId);
+                if (table) {
+                    table.occupied = false;
+                }
+            }
+
+            updateActiveOrdersList();
+            updateDashboard();
+            updateTablesTable();
+
+            alert(`Commande ${order.code} terminée!`);
+        }
+
+        function viewOrderDetails(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+
+            let detailsHTML = `
+                <h3>Commande ${order.code}</h3>
+                <p><strong>Client:</strong> ${order.client}</p>
+                <p><strong>Table:</strong> ${order.table ? `Table ${order.table}` : 'À emporter'}</p>
+                <p><strong>Date:</strong> ${order.date.toLocaleString()}</p>
+                <h4>Détails de la commande:</h4>
+                <table style="width: 100%; margin: 15px 0;">
+                    <thead>
+                        <tr style="background: #f8f9fa;">
+                            <th style="padding: 8px; text-align: left;">Plat</th>
+                            <th style="padding: 8px; text-align: center;">Qté</th>
+                            <th style="padding: 8px; text-align: right;">Prix</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            order.items.forEach(item => {
+                detailsHTML += `
+                    <tr>
+                        <td style="padding: 8px;">${item.name}</td>
+                        <td style="padding: 8px; text-align: center;">${item.quantity}</td>
+                        <td style="padding: 8px; text-align: right;">${(item.price * item.quantity).toLocaleString()} Ar</td>
+                    </tr>
+                `;
+            });
+
+            detailsHTML += `
+                    </tbody>
+                </table>
+                <div style="text-align: right; font-size: 1.2rem; font-weight: bold; margin-top: 15px;">
+                    TOTAL: ${order.total.toLocaleString()} Ar
+                </div>
+            `;
+
+            document.getElementById('reportsContent').innerHTML = detailsHTML;
+            document.getElementById('reportsModal').classList.add('active');
+        }
+
+        // Reservations Management
+        function updateReservationSelect() {
+            const select = document.getElementById('reservationTable');
+            select.innerHTML = '<option value="">Choisir une table</option>';
+            
+            tables.forEach(table => {
+                const option = document.createElement('option');
+                option.value = table.id;
+                option.textContent = `Table ${table.number} - ${table.designation}`;
+                select.appendChild(option);
+            });
+        }
+
+        function addReservation() {
+            const client = document.getElementById('reservationClient').value;
+            const tableId = parseInt(document.getElementById('reservationTable').value);
+            const dateTime = document.getElementById('reservationDateTime').value;
+            const guests = parseInt(document.getElementById('reservationGuests').value);
+
+            if (!client || !tableId || !dateTime || !guests) {
+                alert('Veuillez remplir tous les champs');
+                return;
+            }
+
+            const newReservation = {
+                id: Date.now(),
+                client: client,
+                tableId: tableId,
+                table: tables.find(t => t.id === tableId),
+                dateTime: new Date(dateTime),
+                guests: guests,
+                status: 'active'
+            };
+
+            reservations.push(newReservation);
+            updateReservationsTable();
+            clearReservationForm();
+            updateDashboard();
+        }
+
+        function deleteReservation(id) {
+            reservations = reservations.filter(res => res.id !== id);
+            updateReservationsTable();
+            updateDashboard();
+        }
+
+        function updateReservationsTable() {
+            const tbody = document.getElementById('reservationsTableBody');
+            tbody.innerHTML = '';
+
+            reservations.forEach(reservation => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${reservation.client}</td>
+                    <td>Table ${reservation.table.number}</td>
+                    <td>${reservation.dateTime.toLocaleString()}</td>
+                    <td>${reservation.guests}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteReservation(${reservation.id})" style="padding: 8px 12px; font-size: 0.8rem;">
+                            Annuler
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function clearReservationForm() {
+            document.getElementById('reservationClient').value = '';
+            document.getElementById('reservationTable').value = '';
+            document.getElementById('reservationDateTime').value = '';
+            document.getElementById('reservationGuests').value = '';
+        }
+
+        // Dashboard Updates
+        function updateDashboard() {
+            // Update stats
+            document.getElementById('totalTables').textContent = tables.length;
+            document.getElementById('activeOrders').textContent = orders.filter(o => o.status === 'active').length;
+            
+            // Calculate today's revenue
+            const today = new Date();
+            const todayOrders = orders.filter(order => {
+                return order.date.toDateString() === today.toDateString() && order.status === 'completed';
+            });
+            const todayRevenue = todayOrders.reduce((sum, order) => sum + order.total, 0);
+            document.getElementById('todayRevenue').textContent = todayRevenue.toLocaleString();
+
+            // Today's reservations
+            const todayReservations = reservations.filter(res => {
+                return res.dateTime.toDateString() === today.toDateString();
+            });
+            document.getElementById('reservationsToday').textContent = todayReservations.length;
+
+            // Update table status
+            updateTableStatus();
+            updateRecentOrders();
+        }
+
+        function updateTableStatus() {
+            const container = document.getElementById('tableStatus');
+            container.innerHTML = '';
+
+            tables.forEach(table => {
+                const statusDiv = document.createElement('div');
+                statusDiv.style.cssText = `
+                    display: flex; 
+                    justify-content: space-between; 
+                    align-items: center; 
+                    padding: 10px; 
+                    margin-bottom: 8px; 
+                    background: ${table.occupied ? '#ffe6e6' : '#e6f7f1'}; 
+                    border-radius: 8px;
+                    border-left: 4px solid ${table.occupied ? '#ff6b6b' : '#4ecdc4'};
+                `;
+                statusDiv.innerHTML = `
+                    <span><strong>Table ${table.number}</strong> - ${table.designation}</span>
+                    <span style="color: ${table.occupied ? '#c0392b' : '#27ae60'}; font-weight: bold;">
+                        ${table.occupied ? '🔴 Occupée' : '🟢 Libre'}
+                    </span>
+                `;
+                container.appendChild(statusDiv);
+            });
+        }
+
+        function updateRecentOrders() {
+            const container = document.getElementById('recentOrders');
+            const recentOrders = orders.slice(-5).reverse();
+
+            if (recentOrders.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Aucune commande récente</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            recentOrders.forEach(order => {
+                const orderDiv = document.createElement('div');
+                orderDiv.style.cssText = `
+                    padding: 12px; 
+                    margin-bottom: 10px; 
+                    background: #f8f9fa; 
+                    border-radius: 8px;
+                    border-left: 4px solid ${order.status === 'active' ? '#667eea' : '#4ecdc4'};
+                `;
+                orderDiv.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <strong>${order.code} - ${order.client}</strong>
+                        <span style="color: #667eea; font-weight: bold;">${order.total.toLocaleString()} Ar</span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #7f8c8d;">
+                        ${order.table ? `Table ${order.table}` : 'À emporter'} • 
+                        ${order.status === 'active' ? '🟡 En cours' : '✅ Terminée'}
+                    </div>
+                `;
+                container.appendChild(orderDiv);
+            });
+        }
+
+        // Reports and Analytics
+        function showReports() {
+            const today = new Date();
+            const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+            // Calculate statistics
+            const todayOrders = orders.filter(order => 
+                order.date.toDateString() === today.toDateString()
+            );
+            const monthlyOrders = orders.filter(order => 
+                order.date >= thisMonth
+            );
+
+            const todayRevenue = todayOrders
+                .filter(o => o.status === 'completed')
+                .reduce((sum, order) => sum + order.total, 0);
+            
+            const monthlyRevenue = monthlyOrders
+                .filter(o => o.status === 'completed')
+                .reduce((sum, order) => sum + order.total, 0);
+
+            // Most popular dishes
+            const dishStats = {};
+            orders.forEach(order => {
+                order.items.forEach(item => {
+                    if (!dishStats[item.name]) {
+                        dishStats[item.name] = { quantity: 0, revenue: 0 };
+                    }
+                    dishStats[item.name].quantity += item.quantity;
+                    dishStats[item.name].revenue += item.price * item.quantity;
+                });
+            });
+
+            const popularDishes = Object.entries(dishStats)
+                .sort((a, b) => b[1].quantity - a[1].quantity)
+                .slice(0, 5);
+
+            let reportsHTML = `
+                <div style="margin-bottom: 30px;">
+                    <h3>📊 Statistiques Générales</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 20px 0;">
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 12px;">
+                            <div style="font-size: 1.8rem; font-weight: bold; color: #667eea;">${todayOrders.length}</div>
+                            <div style="color: #7f8c8d;">Commandes Aujourd'hui</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 12px;">
+                            <div style="font-size: 1.8rem; font-weight: bold; color: #4ecdc4;">${todayRevenue.toLocaleString()}</div>
+                            <div style="color: #7f8c8d;">Revenus Aujourd'hui (Ar)</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 12px;">
+                            <div style="font-size: 1.8rem; font-weight: bold; color: #ff6b6b;">${monthlyOrders.length}</div>
+                            <div style="color: #7f8c8d;">Commandes ce Mois</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: #f8f9fa; border-radius: 12px;">
+                            <div style="font-size: 1.8rem; font-weight: bold; color: #f093fb;">${monthlyRevenue.toLocaleString()}</div>
+                            <div style="color: #7f8c8d;">Revenus Mensuels (Ar)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h3>🏆 Plats les Plus Populaires</h3>
+                    <div style="margin-top: 15px;">
+            `;
+
+            if (popularDishes.length > 0) {
+                popularDishes.forEach((dish, index) => {
+                    const [name, stats] = dish;
+                    reportsHTML += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; margin-bottom: 10px; background: #f8f9fa; border-radius: 8px;">
+                            <div>
+                                <span style="font-weight: bold;">${index + 1}. ${name}</span>
+                                <div style="font-size: 0.9rem; color: #7f8c8d;">${stats.quantity} portions vendues</div>
+                            </div>
+                            <div style="text-align: right; color: #667eea; font-weight: bold;">
+                                ${stats.revenue.toLocaleString()} Ar
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                reportsHTML += '<p style="text-align: center; color: #7f8c8d;">Aucune donnée disponible</p>';
+            }
+
+            reportsHTML += `
+                    </div>
+                </div>
+
+                <div>
+                    <h3>📈 Historique des Commandes</h3>
+                    <div style="max-height: 300px; overflow-y: auto; margin-top: 15px;">
+            `;
+
+            const allOrders = [...orders].reverse();
+            if (allOrders.length > 0) {
+                allOrders.forEach(order => {
+                    reportsHTML += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; margin-bottom: 8px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid ${order.status === 'active' ? '#667eea' : '#4ecdc4'};">
+                            <div>
+                                <strong>${order.code} - ${order.client}</strong>
+                                <div style="font-size: 0.9rem; color: #7f8c8d;">
+                                    ${order.date.toLocaleString()} • ${order.table ? `Table ${order.table}` : 'À emporter'}
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: #667eea; font-weight: bold;">${order.total.toLocaleString()} Ar</div>
+                                <div style="font-size: 0.8rem; color: ${order.status === 'active' ? '#f39c12' : '#27ae60'};">
+                                    ${order.status === 'active' ? 'En cours' : 'Terminée'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                reportsHTML += '<p style="text-align: center; color: #7f8c8d;">Aucune commande trouvée</p>';
+            }
+
+            reportsHTML += '</div></div>';
+
+            document.getElementById('reportsContent').innerHTML = reportsHTML;
+            document.getElementById('reportsModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('reportsModal').classList.remove('active');
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTablesTable();
+            updateMenuTable();
+            updateReservationsTable();
+            updateDashboard();
+            
+            // Set minimum date for reservations to today
+            const now = new Date();
+            const dateInput = document.getElementById('reservationDateTime');
+            dateInput.min = now.toISOString().slice(0, 16);
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('reportsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
